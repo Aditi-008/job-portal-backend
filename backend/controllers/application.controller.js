@@ -25,13 +25,11 @@ export const applyJob = async (req, res) => {
       return res.status(400).json({ success: false, message: "Already applied to this job" });
     }
 
-    // ✅ Create new application
     const newApplication = await Application.create({
       job: new mongoose.Types.ObjectId(jobId),
       applicant: new mongoose.Types.ObjectId(userId),
     });
 
-    // ✅ Push application into Job's applications array
     job.applications.push(newApplication._id);
     await job.save();
 
@@ -46,7 +44,7 @@ export const applyJob = async (req, res) => {
   }
 };
 
-// ✅ 2. Get all applicants for a specific job (Admin/Company only)
+// ✅ 2. Get all applicants for a job
 export const getApplicants = async (req, res) => {
   try {
     const jobId = req.params.jobId;
@@ -73,7 +71,7 @@ export const getApplicants = async (req, res) => {
   }
 };
 
-// ✅ 3. Get all jobs the user has applied to
+// ✅ 3. Get all jobs user has applied to
 export const getAppliedJobs = async (req, res) => {
   try {
     const userId = req.id;
@@ -90,7 +88,7 @@ export const getAppliedJobs = async (req, res) => {
   }
 };
 
-// ✅ 4. Update application status (e.g., approved/rejected)
+// ✅ 4. Update application status
 export const updateStatus = async (req, res) => {
   try {
     const applicationId = req.params.applicationId;
@@ -146,6 +144,31 @@ export const getSingleJobWithApplicantsCount = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error in getSingleJobWithApplicantsCount:", error.message);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// ✅ 6. Get recent applicants for a job
+export const getRecentApplicants = async (req, res) => {
+  try {
+    const jobId = req.params.jobId;
+
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ success: false, message: "Job not found" });
+    }
+
+    const recentApplications = await Application.find({ job: jobId })
+      .populate("applicant")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    return res.status(200).json({
+      success: true,
+      recentApplicants: recentApplications,
+    });
+  } catch (error) {
+    console.error("❌ Error in getRecentApplicants:", error.message);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
