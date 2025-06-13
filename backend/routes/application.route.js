@@ -1,12 +1,14 @@
+// ✅ Correct version of backend/routes/application.route.js
+
 import express from "express";
 import { isAuthenticated } from "../middlewares/isAuthenticated.js";
 import {
   applyJob,
-  getApplicants,
   getAppliedJobs,
   updateStatus,
   getSingleJobWithApplicantsCount,
-  getRecentApplicants, // ✅ Added
+  getRecentApplicants,
+  getApplicantsByJob, // ✅ Make sure this exists in your controller
 } from "../controllers/application.controller.js";
 
 const router = express.Router();
@@ -18,7 +20,7 @@ router.post("/apply/:jobId", isAuthenticated, applyJob);
 router.get("/get", isAuthenticated, getAppliedJobs);
 
 // ✅ Get all applicants for a specific job
-router.get("/:jobId/applicants", isAuthenticated, getApplicants);
+router.get("/:jobId/applicants", isAuthenticated, getApplicantsByJob); // ✅ use only this
 
 // ✅ Update application status
 router.post("/status/:applicationId/update", isAuthenticated, updateStatus);
