@@ -17,15 +17,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// CORS configuration
 const corsOptions = {
-    origin: "http://localhost:5173", // frontend origin
-    credentials: true,
+  origin: [
+    "http://localhost:5173", 
+    "https://job-hunt-portal08.netlify.app"
+  ],
+  credentials: true,
 };
-app.use(cors({
-  origin: "http://localhost:5173", // ✅ Your frontend origin
-  credentials: true               // ✅ This must be true to send cookies
-}));
+
+app.use(cors(corsOptions));
+
 
 // Routes
 app.use("/api/v1/user", userRoute);
